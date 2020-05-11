@@ -53,7 +53,7 @@ class Program[F[_], Dir, File](implicit
                                pathsCreator: CreatePathToFile[F, Dir, File]) {
   def run(dir: Dir): F[Unit] = for {
     testDir <- mkDir.mkDir(dir, "test_dir")
-    _ <- ("foo" :: "bar" :: "baz" :: Nil).traverse(mkFile.mkFile(testDir, _))
+    _ <- List("foo", "bar", "baz").traverse(mkFile.mkFile(testDir, _))
     files <- dirFiles.getFiles(testDir)
     filenames <- files.traverse(fileName.getName)
     _ <- filenames.traverse(printer.print)
@@ -64,7 +64,7 @@ class Program[F[_], Dir, File](implicit
   } yield ()
 }
 
-class RealFileSystem[F[_] : Monad] extends MkDir[F, Path]
+class RealFileSystem[F[_] : Applicative] extends MkDir[F, Path]
   with MkFile[F, Path, Path]
   with MoveFile[F, Path]
   with DirFoldable[F, Path, Path]
